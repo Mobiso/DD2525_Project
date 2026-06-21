@@ -1,0 +1,43 @@
+[JENS NOTES]
+I run afl++ with docker: 
+docker pull aflplusplus/aflplusplus
+docker run -ti -v ~/Documents/Uni/langsec/DD2525/Project:/src aflplusplus/aflplusplus
+
+Second command will mount the folder Project as /src in the docker environment or whatever you call it
+
+AFL use STDIN (which is what you use when writing in the terminal
+after you launched the program, i.e NOT a launch argument)
+
+The vuln.c code is vulnerabler to out-of-bound leaks. You can find the secret string
+by typing (for me) 7 in the terminal, which is out of bounds for the array with words.
+
+To make AFL++ detect the leak it can be compiled with: /src # afl-clang-fast -fsanitize=address vuln.c -o vuln
+This instructs the compiler to add code that crashes the program when an out of bound thing occurs. 
+
+I ran AFL with: afl-fuzz -i /src/vuln_seeds/ -o /src/results/ -- /src/vuln
+
+The vuln_seeds, contains seeds, which in my case is just 5 files. First file contains a 0, second file a 1 and so on.
+results is just where to store the result.
+
+-- is what you add after all the setup stuff, everything after -- is your program. Like launch arguments and stuff, I think.
+
+ CC=/home/tobias/Desktop/Y4/Y4/DD2525/DD2525/Project/AFLplusplus/afl-cc CXX=/home/tobias/Desktop/Y4/Y4/DD2525/DD2525/Project/AFLplusplus/afl-c++ ./configure --disable-shared
+
+export PYTHONPATH=$PWD
+export AFL_PYTHON_MODULE=pdf_exploder_v2
+export AFL_CUSTOM_MUTATOR_ONLY=1
+
+
+afl-fuzz -i ./seeds -o out -- /home/tobias/Desktop/Y4/Y4/DD2525/DD2525/Project/xpdf-3.02/xpdf/pdftotext @@ -
+
+
+export AFL_PYTHON_MODULE=png_mutator
+
+
+afl-fuzz -i ./seeds_img -o out_img -- /home/tobias/Desktop/Y4/Y4/DD2525/DD2525/Project/img2ascii/img2ascii -i @@ -w 100
+
+
+for i in $(seq 1 1000);
+do
+    python3 png_tester.py ./outpng.png
+done
